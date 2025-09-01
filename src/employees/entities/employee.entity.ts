@@ -1,5 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  BeforeInsert,
+} from 'typeorm';
 import { Group } from 'src/groups/entities/group.entity';
+import { hash } from 'bcrypt';
 
 @Entity('employees')
 export class Employee {
@@ -11,6 +18,11 @@ export class Employee {
 
   @Column({ name: 'password' })
   password: string;
+
+  @BeforeInsert()
+  async hashPassword() {
+    this.password = await hash(this.password, 10);
+  }
 
   @Column({ name: 'firstname' })
   firstname: string;
