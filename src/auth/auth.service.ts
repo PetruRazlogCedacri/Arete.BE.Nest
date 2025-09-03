@@ -1,6 +1,4 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { Employee } from 'src/employees/entities/employee.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -22,14 +20,14 @@ export class AuthService {
     const employee = await this.employeeRepository.findOne({
       where: { username },
     });
-    if (employee?.password !== password) {
-      throw new UnauthorizedException();
+    if (!employee) {
+      throw new UnauthorizedException('Invalid credentials');
     }
     const isPasswordMatch = await compare(password, employee.password);
     if (!isPasswordMatch) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Invalid credentials');
     }
-    const payload = { sub: employee.id, username: employee.username };
+    const payload = { sub: employee.id, username: employee.username, role:employee.role };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
@@ -39,23 +37,7 @@ export class AuthService {
     return this.validateUser(username, password);
   }
 
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
-  }
-
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async profile(username: string) {
+    return this.employeeRepository.findOne({ where: { username } });
   }
 }

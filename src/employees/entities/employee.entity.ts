@@ -8,6 +8,11 @@ import {
 import { Group } from 'src/groups/entities/group.entity';
 import { hash } from 'bcrypt';
 
+export enum Role {
+  User = 1,
+  GroupOwner = 4,
+  Admin = 8
+}
 @Entity('employees')
 export class Employee {
   @PrimaryGeneratedColumn()
@@ -33,8 +38,8 @@ export class Employee {
   @Column({ name: 'email' })
   email: string;
 
-  @Column({ name: 'role', default: 1 })
-  role: number;
+  @Column({ name: 'role', default: Role.User })
+  role: Role;
 
   @ManyToOne(() => Group, (group) => group.employees, { nullable: true })
   group: Group;
