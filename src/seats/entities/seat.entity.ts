@@ -1,5 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Group } from 'src/groups/entities/group.entity';
+import { Office } from 'src/offices/entities/office.entity';
 
 @Entity('seats')
 export class Seat {
@@ -12,8 +20,9 @@ export class Seat {
   @Column({ name: 'type', type: 'int' })
   type: number;
 
-  @Column({ name: 'office_id', type: 'int' })
-  officeId: number;
+  @ManyToOne(() => Office, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'office_id' })
+  office: Office;
 
   @ManyToMany(() => Group, (group) => group.seats)
   groups: Group[];

@@ -10,7 +10,7 @@ export class CreateReservationDto {
   @ApiProperty({ description: 'Employee ID making the reservation' })
   @IsString()
   @IsNotEmpty()
-  employeeId: string;
+  employeeId: number;
 
   @ApiProperty({ description: 'Start date of the reservation' })
   @IsDateString()
@@ -25,5 +25,5 @@ export class CreateReservationDto {
   @ApiProperty({ description: 'User who created the reservation' })
   @IsString()
   @IsNotEmpty()
-  createdBy: string;
+  createdBy: number;
 }

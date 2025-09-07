@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Seat } from 'src/seats/entities/seat.entity';
 
 @Entity('offices')
 export class Office {
@@ -7,6 +8,9 @@ export class Office {
 
   @Column({ name: 'name' })
   name: string;
+
+  @OneToMany(() => Seat, (seat) => seat.office)
+  seats: Seat[];
 
   @Column({ name: 'capacity', default: 0 })
   capacity: number;
