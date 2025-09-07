@@ -7,14 +7,17 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class ReservationsService {
-  constructor(
-    @InjectRepository(Reservation)
-    private readonly reservationRepository: Repository<Reservation>,
-  ) {}
+  constructor( @InjectRepository(Reservation) private readonly reservationRepository: Repository<Reservation> ) {}
 
-  async create(
-    createReservationDto: CreateReservationDto,
-  ): Promise<Reservation> {
+  createByUser(username: string, createReservationDto: CreateReservationDto): Promise<Reservation> {
+    throw new Error('Method not implemented.');
+  }
+
+  createByGroupOwner(username: string, createReservationDto: CreateReservationDto): Promise<Reservation> {
+    throw new Error('Method not implemented.');
+  }
+
+  async createByAdmin( createReservationDto: CreateReservationDto ): Promise<Reservation> {
     const reservation = this.reservationRepository.create(createReservationDto);
     return await this.reservationRepository.save(reservation);
   }
@@ -35,10 +38,7 @@ export class ReservationsService {
     return reservation;
   }
 
-  async update(
-    id: number,
-    updateReservationDto: UpdateReservationDto,
-  ): Promise<Reservation> {
+  async update( id: number, updateReservationDto: UpdateReservationDto ): Promise<Reservation> {
     const reservation = await this.reservationRepository.findOne({
       where: { id },
     });

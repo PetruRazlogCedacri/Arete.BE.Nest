@@ -1,15 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ReservationsService } from './reservations.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { Role } from 'src/employees/entities/employee.entity';
 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('reservations')
 export class ReservationsController {
   constructor(private readonly reservationsService: ReservationsService) {}
 
+  @Post(':username')
+  create(@Param('username') username: string, @Body() createReservationDto: CreateReservationDto) {
+    return this.reservationsService.createByUser(username, createReservationDto);
+  }
+
   @Post()
-  create(@Body() createReservationDto: CreateReservationDto) {
-    return this.reservationsService.create(createReservationDto);
+  @Roles(Role.Admin)
+  createByAdmin(@Body() createReservationDto: CreateReservationDto) {
+    return this.reservationsService.createByAdmin(createReservationDto);
   }
 
   @Get()
@@ -18,7 +30,7 @@ export class ReservationsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findById(@Param('id') id: string) {
     return this.reservationsService.findOne(+id);
   }
 

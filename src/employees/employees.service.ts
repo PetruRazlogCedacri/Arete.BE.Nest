@@ -21,13 +21,24 @@ export class EmployeesService {
     return await this.employeeRepository.find();
   }
 
-  async findOne(id: number): Promise<Employee> {
-    const employee = await this.employeeRepository.findOne({
-      where: { id },
-    });
+  async findOne(param: number | string): Promise<Employee> {
+    let employee: Employee | null;
+    let errorMessage: string;
+
+    if (typeof param === 'number') {
+      employee = await this.employeeRepository.findOne({
+        where: { id: param },
+      });
+      errorMessage = `Employee with ID ${param} not found`;
+    } else {
+      employee = await this.employeeRepository.findOne({
+        where: { username: param },
+      });
+      errorMessage = `Employee with username ${param} not found`;
+    }
 
     if (!employee) {
-      throw new NotFoundException(`Employee with ID ${id} not found`);
+      throw new NotFoundException(errorMessage);
     }
 
     return employee;
