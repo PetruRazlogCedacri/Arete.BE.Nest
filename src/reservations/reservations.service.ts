@@ -21,15 +21,15 @@ export class ReservationsService {
   createByUser(
     username: string,
     createReservationDto: CreateReservationDto,
-  ): Promise<Reservation> {
-    throw new Error('Method not implemented.');
+  ) {
+    return 'This action adds a new reservation with user role';
   }
-
+  
   createByGroupOwner(
     username: string,
     createReservationDto: CreateReservationDto,
-  ): Promise<Reservation> {
-    throw new Error('Method not implemented.');
+  ) {
+    return 'This action adds a new reservation with group owner role';
   }
 
   async createByAdmin(
