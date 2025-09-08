@@ -1,15 +1,25 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { Employee } from 'src/employees/entities/employee.entity';
+import { Seat } from 'src/seats/entities/seat.entity';
 
 @Entity('reservations')
 export class Reservation {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'seat_id', type: 'int' })
-  seatId: number;
+  @ManyToOne(() => Seat, { nullable: false })
+  @JoinColumn({ name: 'seat_id' })
+  seat: Seat;
 
-  @Column({ name: 'employee_id', type: 'varchar' })
-  employeeId: string;
+  @ManyToOne(() => Employee, { nullable: false })
+  @JoinColumn({ name: 'employee_id' })
+  employee: Employee;
 
   @Column({ name: 'start_date', type: 'datetime' })
   startDate: Date;
@@ -24,6 +34,7 @@ export class Reservation {
   })
   createdAt: Date;
 
-  @Column({ name: 'created_by', type: 'varchar' })
-  createdBy: string;
+  @ManyToOne(() => Employee, { nullable: false })
+  @JoinColumn({ name: 'created_by' })
+  createdBy: Employee;
 }

@@ -1,4 +1,3 @@
-import { Employee } from 'src/employees/entities/employee.entity';
 import {
   Column,
   Entity,
@@ -8,6 +7,7 @@ import {
   JoinTable,
 } from 'typeorm';
 import { Seat } from 'src/seats/entities/seat.entity';
+import { Employee } from 'src/employees/entities/employee.entity';
 
 @Entity('groups')
 export class Group {
@@ -26,7 +26,7 @@ export class Group {
   @OneToMany(() => Employee, (employee) => employee.group)
   employees: Employee[];
 
-  @ManyToMany(() => Seat, (seat) => seat.groups)
+  @ManyToMany(() => Seat, (seat) => seat.groups, { cascade: true })
   @JoinTable({ name: 'group_seats' })
   seats: Seat[];
 }

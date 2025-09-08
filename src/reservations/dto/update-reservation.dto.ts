@@ -9,12 +9,18 @@ export class UpdateReservationDto extends PartialType(CreateReservationDto) {
   @IsOptional()
   seatId?: number;
 
-  @ApiProperty({ description: 'Employee ID making the reservation', required: false })
+  @ApiProperty({
+    description: 'Employee ID making the reservation',
+    required: false,
+  })
   @IsString()
   @IsOptional()
-  employeeId?: string;
+  employeeId?: number;
 
-  @ApiProperty({ description: 'Start date of the reservation', required: false })
+  @ApiProperty({
+    description: 'Start date of the reservation',
+    required: false,
+  })
   @IsDateString()
   @IsOptional()
   startDate?: Date;
@@ -24,8 +30,11 @@ export class UpdateReservationDto extends PartialType(CreateReservationDto) {
   @IsOptional()
   endDate?: Date;
 
-  @ApiProperty({ description: 'User who created the reservation', required: false })
+  @ApiProperty({
+    description: 'User who created the reservation',
+    required: false,
+  })
   @IsString()
   @IsOptional()
-  createdBy?: string;
+  createdBy?: number;
 }
