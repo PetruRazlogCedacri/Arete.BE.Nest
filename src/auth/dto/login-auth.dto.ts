@@ -24,3 +24,9 @@ export class AuthResponseDto {
   email: string;
   role: Role.User | Role.GroupOwner | Role.Admin;
 }
+
+export interface JwtUser {
+  id: number;
+  username: string;
+  role: Role;
+}
