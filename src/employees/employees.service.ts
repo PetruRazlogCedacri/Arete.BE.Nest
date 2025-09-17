@@ -18,7 +18,7 @@ export class EmployeesService {
   }
 
   async findAll(): Promise<Employee[]> {
-    return await this.employeeRepository.find();
+    return await this.employeeRepository.find({ loadRelationIds: true });
   }
 
   async findOne(param: number | string): Promise<Employee> {

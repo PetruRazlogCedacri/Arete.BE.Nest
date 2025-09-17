@@ -18,7 +18,7 @@ export class GroupsService {
   }
 
   async findAll(): Promise<Group[]> {
-    return await this.groupRepository.find({ relations: ['employees'] });
+    return await this.groupRepository.find({ loadRelationIds: true });
   }
 
   async findOne(id: number): Promise<Group> {
