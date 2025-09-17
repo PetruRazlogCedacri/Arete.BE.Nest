@@ -31,28 +31,8 @@ export class ReservationsController {
     @Req() req: Request & { user: JwtUser },
     @Body() createReservationDto: CreateReservationDto,
   ) {
-    console.log('Request user :>> ', req.user);
-    const user = req.user;
-    const userRole = user.role;
-    const username = user.username;
-
-    switch (userRole) {
-      case Role.Admin:
-        return this.reservationsService.createByAdmin(createReservationDto);
-
-      case Role.GroupOwner:
-        return this.reservationsService.createByGroupOwner(
-          username,
-          createReservationDto,
-        );
-
-      case Role.User:
-      default:
-        return this.reservationsService.createByUser(
-          username,
-          createReservationDto,
-        );
-    }
+    console.log('POST /reservations. user :>> ', req.user);
+    return this.reservationsService.create(createReservationDto);
   }
 
   @Get()

@@ -17,12 +17,23 @@ export class LoginDto {
 }
 
 export class AuthResponseDto {
+  @ApiProperty()
   id: number;
+  
+  @ApiProperty()
   username: string;
+  
+  @ApiProperty()
   firstname: string;
+  
+  @ApiProperty()
   lastname: string;
+  
+  @ApiProperty()
   email: string;
-  role: Role.User | Role.GroupOwner | Role.Admin;
+  
+  @ApiProperty({ enum: Role })
+  role: Role;
 }
 
 export interface JwtUser {

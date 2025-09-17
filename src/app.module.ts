@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -13,6 +13,8 @@ import { seconds, ThrottlerModule } from '@nestjs/throttler';
 import { JwtModule } from '@nestjs/jwt';
 import JwtConfigService from './config/jwt-config.factory';
 import { JwtStrategy } from './auth/strategies/jwt.strategy';
+import { DataSource } from 'typeorm';
+import { initializeDatabase } from './init.data';
 
 @Module({
   imports: [
@@ -30,15 +32,21 @@ import { JwtStrategy } from './auth/strategies/jwt.strategy';
       useClass: TypeOrmConfigService,
     }),
     ThrottlerModule.forRoot({
-      throttlers: [{ttl: seconds(3), limit: 3}]
+      throttlers: [{ ttl: seconds(3), limit: 3 }],
     }),
     JwtModule.registerAsync({
-      imports:[ConfigModule],
+      imports: [ConfigModule],
       inject: [ConfigService],
-      useClass: JwtConfigService
-    })
+      useClass: JwtConfigService,
+    }),
   ],
   controllers: [],
   providers: [JwtStrategy],
 })
-export class AppModule {}
+export class AppModule implements OnApplicationBootstrap {
+  constructor(private readonly dataSource: DataSource) {}
+
+  async onApplicationBootstrap() {
+    await initializeDatabase(this.dataSource);
+  }
+}

@@ -4,7 +4,7 @@ import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Reservation } from './entities/reservation.entity';
 import { Repository } from 'typeorm';
-import { Employee } from 'src/employees/entities/employee.entity';
+import { Employee, Role } from 'src/employees/entities/employee.entity';
 import { Seat } from 'src/seats/entities/seat.entity';
 
 @Injectable()
@@ -32,7 +32,7 @@ export class ReservationsService {
     return 'This action adds a new reservation with group owner role';
   }
 
-  async createByAdmin(
+  async create(
     createReservationDto: CreateReservationDto,
   ): Promise<Reservation> {
     const { seatId, employeeId, startDate, endDate, createdBy } =
@@ -52,6 +52,28 @@ export class ReservationsService {
     });
     if (!creator)
       throw new NotFoundException(`Creator with ID ${createdBy} not found`);
+
+    switch (creator.role) {
+      case Role.Admin:
+        `Create a reservation without restrictions, 
+        still must check that the seat is free for the entire period.`;
+        break;
+
+      case Role.GroupOwner:
+        `Create a reservation with Group Owner restrictions. 
+        The employee should be in the group managed by the Group Owner, 
+        the seat should be an allowed seat, the date should be within the next 5 working days.`;
+        break;
+
+      case Role.User:
+        `Create a reservation with User restrictions. 
+        The seat should be an allowed seat, the date should be today or the next working day.`;
+        break;
+
+      default:
+        `If no employee not found or no role found, throw unauthorized error.`;
+        break;
+    }
 
     const reservation = this.reservationRepository.create({
       seat,
