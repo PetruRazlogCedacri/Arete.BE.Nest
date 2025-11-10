@@ -26,7 +26,7 @@ export class Seat {
 
   @ManyToOne(() => Office, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'office_id' })
-  office: Office;
+  office: number;
 
   @ManyToMany(() => Group, (group) => group.seats)
   groups: Group[];

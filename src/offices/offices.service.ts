@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class OfficesService {
   constructor(
-    @InjectRepository(Office) private officeRepository: Repository<Office>,
+    @InjectRepository(Office) private readonly officeRepository: Repository<Office>,
   ) {}
 
   async create(createOfficeDto: CreateOfficeDto): Promise<Office> {

@@ -2,6 +2,7 @@ import { Controller, Post, HttpCode, HttpStatus, UseGuards, Request, } from '@ne
 import { AuthService } from './auth.service';
 import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { LoginDto } from './dto/login-auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -12,17 +13,8 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @ApiOperation({ summary: 'User login' })
   @ApiBody({ 
-    type: 'object',
-    description: 'User login credentials',
-    examples: {
-      user: {
-        summary: 'User login example',
-        value: {
-          username: '',
-          password: ''
-        }
-      }
-    }
+    type: LoginDto,
+    description: 'User login credentials'
   })
   @ApiResponse({ 
     status: 200, 

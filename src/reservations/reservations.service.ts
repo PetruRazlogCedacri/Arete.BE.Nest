@@ -18,13 +18,10 @@ export class ReservationsService {
     private readonly reservationRepository: Repository<Reservation>,
   ) {}
 
-  createByUser(
-    username: string,
-    createReservationDto: CreateReservationDto,
-  ) {
+  createByUser(username: string, createReservationDto: CreateReservationDto) {
     return 'This action adds a new reservation with user role';
   }
-  
+
   createByGroupOwner(
     username: string,
     createReservationDto: CreateReservationDto,
@@ -59,15 +56,19 @@ export class ReservationsService {
         still must check that the seat is free for the entire period.`;
         break;
 
-        case Role.GroupOwner:
+      case Role.GroupOwner:
         `Create a reservation with Group Owner restrictions. 
         The employee should be in the group managed by the Group Owner, 
         the seat should be an allowed seat, the date should be within the next 5 working days.`;
         break;
-    
-      default:
+
+      case Role.User:
         `Create a reservation with User restrictions. 
-        The seat should be an allowed seat, the date should be today or the next working day.`
+        The seat should be an allowed seat, the date should be today or the next working day.`;
+        break;
+
+      default:
+        `If no employee not found or no role found, throw unauthorized error.`;
         break;
     }
 

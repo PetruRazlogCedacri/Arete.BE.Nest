@@ -1,14 +1,17 @@
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Employee, Role } from './employees/entities/employee.entity';
 import { CreateEmployeeDto } from './employees/dto/create-employee.dto';
 import { Group } from './groups/entities/group.entity';
 import { CreateGroupDto } from './groups/dto/create-group.dto';
 import { Office } from './offices/entities/office.entity';
 import { CreateOfficeDto } from './offices/dto/create-office.dto';
+import { Seat, SeatType } from './seats/entities/seat.entity';
 
 export async function initializeDatabase(dataSource: DataSource) {
   let savedGroups: Group[] = await initGroups(dataSource);
   await initEmployees(dataSource, savedGroups);
+  await initOffices(dataSource);
+  await initSeats(dataSource);
 }
 
 async function initEmployees(dataSource: DataSource, savedGroups: Group[]) {
@@ -139,7 +142,7 @@ async function initEmployees(dataSource: DataSource, savedGroups: Group[]) {
     const employees = await employeeRepository.save(initEmployees);
     console.log(
       'Database seeded with initial employees :>> ',
-      employees.map((employee) => employee.username)
+      employees.map((employee) => employee.username),
     );
   }
 }
@@ -168,41 +171,114 @@ async function initGroups(dataSource: DataSource) {
 
   if (groupsCount < initGroups.length) {
     savedGroups = await groupRepository.save(initGroups);
-    console.log('Database seeded with initial groups :>> ', savedGroups.map(group => group.name));
+    console.log(
+      'Database seeded with initial groups :>> ',
+      savedGroups.map((group) => group.name),
+    );
   }
   return savedGroups;
 }
 
-async function initOffices(dataSource:DataSource) {
+async function initOffices(dataSource: DataSource) {
   const officeRepository = dataSource.getRepository(Office);
   const officesCount = await officeRepository.count();
 
-const _603 = officeRepository.create({
-  name:'603',
-  columns: 4,
-  capacity:32
-});
-const _604 = officeRepository.create({
-  name:'604',
-  columns: 4,
-  capacity:24
-});
-  const _605 = officeRepository.create({
-    name:'605',
+  const _603 = officeRepository.create({
+    name: '603',
     columns: 4,
-    capacity:48
+    capacity: 32,
+  });
+  const _604 = officeRepository.create({
+    name: '604',
+    columns: 4,
+    capacity: 24,
+  });
+  const _605 = officeRepository.create({
+    name: '605',
+    columns: 4,
+    capacity: 48,
   });
 
-  const initOffices:CreateOfficeDto[] = [_603,_604,_605];
+  const initOffices: CreateOfficeDto[] = [_603, _604, _605];
   let savedOffices: Office[] = [];
 
   if (officesCount < initOffices.length) {
     savedOffices = await officeRepository.save(initOffices);
-    console.log('Database seeded with initial offices :>> ', savedOffices.map(office => office.name));
+    console.log(
+      'Database seeded with initial offices :>> ',
+      savedOffices.map((office) => office.name),
+    );
   }
   return savedOffices;
 }
 
-async function initSeats(dataSource:DataSource) {
-  console.log('To do');
+async function initSeats(dataSource: DataSource) {
+  const seatRepository = dataSource.getRepository(Seat);
+  const officeRepository = dataSource.getRepository(Office);
+  const seatsCount = await seatRepository.count();
+  console.log('seatsCount :>> ', seatsCount);
+
+  // If seats already exist, don't recreate them
+  if (seatsCount > 0) {
+    console.log('Seats already initialized');
+    return;
+  }
+
+  // Get all offices
+  const offices = await officeRepository.find();
+  let allSeats: Seat[] = [];
+
+  for (const office of offices) {
+    const officeSeats = await createSeatsForOffice(office, seatRepository);
+    allSeats = [...allSeats, ...officeSeats];
+  }
+
+  // Save all seats at once
+  const savedSeats = await seatRepository.save(allSeats);
+  console.log(`Database seeded with ${savedSeats.length} seats`);
+  return savedSeats;
+}
+
+async function createSeatsForOffice(
+  office: Office,
+  seatRepository: any,
+): Promise<Seat[]> {
+  const seats: Seat[] = [];
+  const columns = ['A', 'B', 'C', 'D']; // Based on columns = 4
+  const seatsPerColumn = Math.ceil(office.capacity / office.columns);
+
+  let seatCounter = 1;
+
+  for (let col = 0; col < office.columns; col++) {
+    for (let row = 1; row <= seatsPerColumn; row++) {
+      // Stop if we've reached the office capacity
+      if (seatCounter > office.capacity) break;
+
+      const seatName = `${office.name}-${row}${columns[col]}`;
+
+      const seat = seatRepository.create({
+        name: seatName,
+        type: SeatType.Dynamic,
+        office: office.id,
+      });
+
+      seats.push(seat);
+      seatCounter++;
+    }
+  }
+
+  console.log(`Created ${seats.length} seats for office ${office.name}`);
+  return seats;
+}
+
+// Main initialization function
+async function initializeData(dataSource: DataSource) {
+  try {
+    const offices = await initOffices(dataSource);
+    const seats = await initSeats(dataSource);
+    return { offices, seats };
+  } catch (error) {
+    console.error('Error initializing data:', error);
+    throw error;
+  }
 }
