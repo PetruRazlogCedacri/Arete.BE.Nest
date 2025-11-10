@@ -216,15 +216,7 @@ async function initSeats(dataSource: DataSource) {
   const seatRepository = dataSource.getRepository(Seat);
   const officeRepository = dataSource.getRepository(Office);
   const seatsCount = await seatRepository.count();
-  console.log('seatsCount :>> ', seatsCount);
 
-  // If seats already exist, don't recreate them
-  if (seatsCount > 0) {
-    console.log('Seats already initialized');
-    return;
-  }
-
-  // Get all offices
   const offices = await officeRepository.find();
   let allSeats: Seat[] = [];
 
@@ -233,9 +225,11 @@ async function initSeats(dataSource: DataSource) {
     allSeats = [...allSeats, ...officeSeats];
   }
 
-  // Save all seats at once
   const savedSeats = await seatRepository.save(allSeats);
-  console.log(`Database seeded with ${savedSeats.length} seats`);
+
+  if (seatsCount < savedSeats.length) {
+    console.log(`Database seeded with ${savedSeats.length} seats`);
+  }
   return savedSeats;
 }
 
@@ -244,14 +238,14 @@ async function createSeatsForOffice(
   seatRepository: any,
 ): Promise<Seat[]> {
   const seats: Seat[] = [];
-  const columns = ['A', 'B', 'C', 'D']; // Based on columns = 4
+
+  const columns = createColumnsHeader(office.columns);
   const seatsPerColumn = Math.ceil(office.capacity / office.columns);
 
   let seatCounter = 1;
 
   for (let col = 0; col < office.columns; col++) {
     for (let row = 1; row <= seatsPerColumn; row++) {
-      // Stop if we've reached the office capacity
       if (seatCounter > office.capacity) break;
 
       const seatName = `${office.name}-${row}${columns[col]}`;
@@ -267,18 +261,13 @@ async function createSeatsForOffice(
     }
   }
 
-  console.log(`Created ${seats.length} seats for office ${office.name}`);
   return seats;
 }
 
-// Main initialization function
-async function initializeData(dataSource: DataSource) {
-  try {
-    const offices = await initOffices(dataSource);
-    const seats = await initSeats(dataSource);
-    return { offices, seats };
-  } catch (error) {
-    console.error('Error initializing data:', error);
-    throw error;
+function createColumnsHeader(columns: number) {
+  const columnHeaders: string[] = [];
+  for (let i = 0; i < columns; i++) {
+    columnHeaders.push(String.fromCharCode(65 + i)); // ASCII A=65, B=66, ...
   }
+  return columnHeaders;
 }
